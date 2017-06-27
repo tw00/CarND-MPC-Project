@@ -7,7 +7,7 @@
 using namespace std;
 
 // Set the timestep length and duration
-const size_t N = 15;
+const size_t N = 10;
 const double dt = 0.1;
 
 // This value assumes the model presented in the classroom is used.

@@ -35,22 +35,19 @@ class FG_eval {
     }
     // minimize actuators
     for (int t = 0; t < N - 1; t++) {
-      //cost += 0.001*CppAD::pow(vars[delta_start + t], 2);
-      //cost += 5*CppAD::pow(vars[a_start + t], 2);
       cost += 3 * CppAD::pow(vars[delta_start + t], 2);
       cost += 3 * CppAD::pow(vars[a_start + t], 2);
     }
     // minimize actuator speed
     for (int t = 0; t < N - 2; t++) {
       cost += 100 * CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
-      cost +=  10 * CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
+      cost +=   1 * CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
     }
     fg[0] = cost;
 
     //
     // Setup Constraints
     //
-    // TODO?
 
     // Initial constraints
     //
@@ -83,9 +80,6 @@ class FG_eval {
       AD<double> v1 = vars[v_start + t];
       AD<double> cte1 = vars[cte_start + t];
       AD<double> epsi1 = vars[epsi_start + t];
-
-      //AD<double> f0 = coeffs[0] + coeffs[1] * x0;
-      //AD<double> psides0 = CppAD::atan( coeffs[1] ); // poly 2nd degree
 
       AD<double> f0 = coeffs[0] + coeffs[1]*x0 + coeffs[2]*x0*x0 + coeffs[3]*x0*x0*x0;
       AD<double> psides0 = CppAD::atan(3*coeffs[3]*x0*x0 + 2*coeffs[2]*x0 + coeffs[1]);
@@ -239,10 +233,9 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   // return solution;
 
   // Return the solution
-  vector<double> solution_vector;
+  vector<double> ret;
   for (size_t i = 0; i < solution.x.size(); ++i) {
-    solution_vector.push_back(solution.x[i]);
+    ret.push_back(solution.x[i]);
   }
-  return solution_vector;
-  //return (vector<double>)solution.x;
+  return ret;
 }
