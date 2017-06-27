@@ -90,12 +90,13 @@ int main() {
           double px    = j[1]["x"];
           double py    = j[1]["y"];
           double psi   = j[1]["psi"]; // (0-2pi)
-          double v     = ((double)j[1]["speed"]) * 0.44704; // (miles/h) --> (m/s)
+          //double v     = ((double)j[1]["speed"]) * 0.44704; // (miles/h) --> (m/s)
+          double v     = j[1]["speed"]; // (miles/h)
+          double delta = j[1]["steering_angle"];
+          double a     = j[1]["throttle"];
 
           // simulate delay
-          double delta = j[1]["steering_angle"];
-          double a = j[1]["throttle"];
-          const double latency = 0.2;
+          const double latency = 0.15;
           px  += v * cos(psi) * latency;
           py  += v * sin(psi) * latency;
           psi -= ( v / Lf ) * delta * latency;
@@ -104,7 +105,7 @@ int main() {
           if( true )
               std::cout << "psi = " << psi << ", px = " << px << ", py = " << py << std::endl;
 
-          // convert to position into car coordinates
+          // convert position into car coordinates
           for (size_t i = 0; i < ptsx.size(); i++) {
               double psi_ref = 0.0;
               double shift_x = ptsx[i] - px;
@@ -150,18 +151,20 @@ int main() {
           Eigen::VectorXd state(6);
           double cte = polyeval(coeffs, 0);
           double epsi = -atan(coeffs[1]);
-          //state << 0.0, 0.0, 0.0, (v/0.44704), cte, epsi;
           state(0) = 0.0;
           state(1) = 0.0;
           state(2) = 0.0;
-          state(3) = v / 0.44704;
+          //state(3) = v / 0.44704;
+          state(3) = v;
           state(4) = cte;
           state(5) = epsi;
 
           // solve MPC optimization problem
           vector<double> result;
           result = mpc.Solve(state, coeffs);
-          steer_value    = -result[delta_start] / deg2rad(25);
+          // steer_value    = -result[delta_start] / deg2rad(25);
+          //steer_value    = -result[delta_start] / (deg2rad(25) * Lf);
+          steer_value    = -result[delta_start];
           throttle_value = result[a_start];
 
           json msgJson;
