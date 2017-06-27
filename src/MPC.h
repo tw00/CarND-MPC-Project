@@ -7,8 +7,8 @@
 using namespace std;
 
 // Set the timestep length and duration
-const size_t N = 12;
-const double dt = 0.05;
+const size_t N = 15;
+const double dt = 0.1;
 
 // This value assumes the model presented in the classroom is used.
 //
@@ -24,7 +24,7 @@ const double Lf = 2.67;
 
 // NOTE: feel free to play around with this
 // or do something completely different
-const double ref_v = 30;
+const double ref_v = 60;
 
 // The solver takes all the state variables and actuator
 // variables in a singular vector. Thus, we should to establish

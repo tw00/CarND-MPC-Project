@@ -26,24 +26,24 @@ class FG_eval {
 
     // minimize error towards reference state
     for (int t = 0; t < N; t++) {
-      cost += 1000*CppAD::pow( vars[cte_start + t], 2 );
-      cost += 1000*CppAD::pow( vars[epsi_start + t], 2 );
+      cost += 1000 * CppAD::pow( vars[cte_start + t], 2 );
+      cost += 1000 * CppAD::pow( vars[epsi_start + t], 2 );
     }
     // minimize ref speed error
     for (int t = 1; t < N; t++) {
-      cost += CppAD::pow(vars[v_start + t] - ref_v, 2);
+      cost += 0.1 * CppAD::pow(vars[v_start + t] - ref_v, 2);
     }
     // minimize actuators
     for (int t = 0; t < N - 1; t++) {
       //cost += 0.001*CppAD::pow(vars[delta_start + t], 2);
       //cost += 5*CppAD::pow(vars[a_start + t], 2);
-      cost += CppAD::pow(vars[delta_start + t], 2);
-      cost += CppAD::pow(vars[a_start + t], 2);
+      cost += 3 * CppAD::pow(vars[delta_start + t], 2);
+      cost += 3 * CppAD::pow(vars[a_start + t], 2);
     }
     // minimize actuator speed
     for (int t = 0; t < N - 2; t++) {
-      cost += 20000 * CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
-      cost += 0.1   * CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
+      cost += 100 * CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
+      cost +=  10 * CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
     }
     fg[0] = cost;
 
