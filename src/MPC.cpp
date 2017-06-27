@@ -26,12 +26,14 @@ class FG_eval {
 
     // minimize error towards reference state
     for (int t = 0; t < N; t++) {
+      // put higher emphasis on the control task (minimize cte and orientation error)
       cost += 1000 * CppAD::pow( vars[cte_start + t], 2 );
       cost += 1000 * CppAD::pow( vars[epsi_start + t], 2 );
     }
     // minimize ref speed error
     for (int t = 1; t < N; t++) {
-      cost += 0.1 * CppAD::pow(vars[v_start + t] - ref_v, 2);
+      // a weight of 10 results in an appropriate trade of between speed and control stability
+      cost += 10 * CppAD::pow(vars[v_start + t] - ref_v, 2);
     }
     // minimize actuators
     for (int t = 0; t < N - 1; t++) {
@@ -40,14 +42,11 @@ class FG_eval {
     }
     // minimize actuator speed
     for (int t = 0; t < N - 2; t++) {
+      // especially limit actuator speed of steering wheel to prevent fast steering
       cost += 100 * CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
       cost +=   1 * CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
     }
     fg[0] = cost;
-
-    //
-    // Setup Constraints
-    //
 
     // Initial constraints
     //
@@ -81,6 +80,7 @@ class FG_eval {
       AD<double> cte1 = vars[cte_start + t];
       AD<double> epsi1 = vars[epsi_start + t];
 
+      // 3rd degree polynom
       AD<double> f0 = coeffs[0] + coeffs[1]*x0 + coeffs[2]*x0*x0 + coeffs[3]*x0*x0*x0;
       AD<double> psides0 = CppAD::atan(3*coeffs[3]*x0*x0 + 2*coeffs[2]*x0 + coeffs[1]);
 
@@ -172,7 +172,7 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
     constraints_lowerbound[i] = 0;
     constraints_upperbound[i] = 0;
   }
-  /**** NEU ****/
+
   constraints_lowerbound[x_start]    = state[0]; // x
   constraints_lowerbound[y_start]    = state[1]; // y
   constraints_lowerbound[psi_start]  = state[2]; // psi
@@ -186,7 +186,6 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   constraints_upperbound[v_start]    = state[3]; // v
   constraints_upperbound[cte_start]  = state[4]; // cte 
   constraints_upperbound[epsi_start] = state[5]; // epsi
-  /**** NEU ****/
 
   // object that computes objective and constraints
   FG_eval fg_eval(coeffs);
@@ -222,7 +221,7 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
 
   // Cost
   auto cost = solution.obj_value;
-  std::cout << "Cost " << cost << std::endl;
+  if( true ) std::cout << "Cost " << cost << std::endl;
 
   // Return the first actuator values. The variables can be accessed with
   // `solution.x[i]`.

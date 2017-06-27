@@ -94,7 +94,7 @@ int main() {
           double delta = j[1]["steering_angle"];
           double a     = j[1]["throttle"];
 
-          // simulate delay
+          // simulate delay of 100 ms using motion model
           const double latency = 0.10;
           px  += v * cos(psi) * latency;
           py  += v * sin(psi) * latency;
@@ -103,7 +103,7 @@ int main() {
 
           if( true ) std::cout << "psi = " << psi << ", px = " << px << ", py = " << py << std::endl;
 
-          // convert position into car coordinates
+          // convert way points into car coordinates
           for (size_t i = 0; i < ptsx.size(); i++) {
               double psi_ref = 0.0;
               double shift_x = ptsx[i] - px;
@@ -139,8 +139,7 @@ int main() {
           // solve MPC optimization problem
           vector<double> result;
           result = mpc.Solve(state, coeffs);
-          //steer_value    = -result[delta_start] / (deg2rad(25) * Lf);
-          steer_value    = -result[delta_start];
+          steer_value    = -result[delta_start] / (deg2rad(25) * Lf);
           throttle_value = result[a_start];
 
           json msgJson;

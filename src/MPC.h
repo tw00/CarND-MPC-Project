@@ -7,8 +7,8 @@
 using namespace std;
 
 // Set the timestep length and duration
-const size_t N = 10;
-const double dt = 0.1;
+const double dt = 0.1; // a time step of 0.1 provides enough resolution
+const size_t N = 10; // planing one second ahead is sufficient for this control task
 
 // This value assumes the model presented in the classroom is used.
 //
