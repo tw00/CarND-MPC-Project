@@ -90,13 +90,13 @@ int main() {
           double px    = j[1]["x"];
           double py    = j[1]["y"];
           double psi   = j[1]["psi"]; // (0-2pi)
-          //double v     = ((double)j[1]["speed"]) * 0.44704; // (miles/h) --> (m/s)
+          // double v     = ((double)j[1]["speed"]) * 0.44704; // (miles/h) --> (m/s)
           double v     = j[1]["speed"]; // (miles/h)
           double delta = j[1]["steering_angle"];
           double a     = j[1]["throttle"];
 
           // simulate delay
-          const double latency = 0.15;
+          const double latency = 0.10;
           px  += v * cos(psi) * latency;
           py  += v * sin(psi) * latency;
           psi -= ( v / Lf ) * delta * latency;
@@ -154,7 +154,7 @@ int main() {
           state(0) = 0.0;
           state(1) = 0.0;
           state(2) = 0.0;
-          //state(3) = v / 0.44704;
+          // state(3) = v / 0.44704;
           state(3) = v;
           state(4) = cte;
           state(5) = epsi;
