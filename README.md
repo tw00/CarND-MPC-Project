@@ -7,8 +7,56 @@ Self-Driving Car Engineer Nanodegree Program
 
 # Model
 
+The kinematic model used here is
+
 ![alt text](img/motion_model.png "Motion model")
 
+where
+
+* x, y are car coordinates
+* psi is the car rotation angle
+* v is the velocity
+* delta is the steering wheel position
+* a is the acceleration (> 0) or brake (< 0)
+* Lf is distance between the front of the vehicle and its center of gravity
+
+
+Vector of (x, y, psi, v) is car state that changes through time and by influence of actuators (delta, a) that
+
+MPC applies to the model.s
+So MPC optimize current and future actuators to keep states in desired values using following loss function:
+
+```
+27     // minimize error towards reference state
+28     for (int t = 0; t < N; t++) {
+29       // put higher emphasis on the control task (minimize cte and orientation error)
+30       cost += 1000 * CppAD::pow( vars[cte_start + t], 2 );
+31       cost += 1000 * CppAD::pow( vars[epsi_start + t], 2 );
+32     }
+33     // minimize ref speed error
+34     for (int t = 1; t < N; t++) {
+35       // a weight of 10 results in an appropriate trade of between speed and control stability
+36       cost += 10 * CppAD::pow(vars[v_start + t] - ref_v, 2);
+37     }
+38     // minimize actuators
+39     for (int t = 0; t < N - 1; t++) {
+40       cost += 3 * CppAD::pow(vars[delta_start + t], 2);
+41       cost += 3 * CppAD::pow(vars[a_start + t], 2);
+42     }
+43     // minimize actuator speed
+44     for (int t = 0; t < N - 2; t++) {
+45       // especially limit actuator speed of steering wheel to prevent fast steering
+46       cost += 1000 * CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
+47       cost +=    1 * CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
+48     }
+```
+
+* cte - cross track error
+* epsi - error of car orientation. It is difference between current psi and desired psi in the current point
+* (v - v_desired)^2 - we want our car to drive with desired velocity
+* delta^2 and a^2 - we want not to use big actuators values without reason
+* 1000 * (delta - delta_prev)^2 - we want to have smooth steering commands between iterations
+* 100 * (a - a_prev)^2 - we want to have smooth gas/break commands between iterations
 
 # Hyper parameters
 
