@@ -1,5 +1,16 @@
+
+
 # CarND-Controls-MPC
 Self-Driving Car Engineer Nanodegree Program
+
+---
+
+# Model
+
+![alt text](img/motion_model.png "Motion model")
+
+
+# Hyper parameters
 
 ---
 
