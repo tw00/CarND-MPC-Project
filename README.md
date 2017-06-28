@@ -20,8 +20,9 @@ where
 * a is the acceleration (> 0) or brake (< 0)
 * Lf is distance between the front of the vehicle and its center of gravity
 
-Model predictive control (MPC) optimizes the current and future actuator values (delta, a) to bring the state (x, y, psi, v) in a desired state, which is described by a loss function. The following loss is used
+Model predictive control (MPC) optimizes the current and future actuator values (delta, a) to bring the state (x, y, psi, v) in a desired state, which is described by a loss function.
 
+The following loss function is used here:
 ```
 27     // minimize error towards reference state
 28     for (int t = 0; t < N; t++) {
@@ -65,6 +66,17 @@ For the simulator the following values give good results:
 * dt = 0.1 (a time step of 0.1 provides enough resolution)
 * N = 10 (planing one second ahead is sufficient for this control task)
 
+## Car Latency
+
+The latency (which is set to 100ms in the simulator) is considered by predicting the future state of the car using a motion model:
+
+```
+const double latency = 0.10;
+px  += v * cos(psi) * latency;
+py  += v * sin(psi) * latency;
+psi -= ( v / Lf ) * delta * latency;
+v   += a * latency;
+```
 ---
 
 ## Dependencies
