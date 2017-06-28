@@ -20,11 +20,7 @@ where
 * a is the acceleration (> 0) or brake (< 0)
 * Lf is distance between the front of the vehicle and its center of gravity
 
-
-Vector of (x, y, psi, v) is car state that changes through time and by influence of actuators (delta, a) that
-
-MPC applies to the model.s
-So MPC optimize current and future actuators to keep states in desired values using following loss function:
+Model predictive control (MPC) optimizes the current and future actuator values (delta, a) to bring the state (x, y, psi, v) in a desired state, which is described by a loss function. The following loss is used
 
 ```
 27     // minimize error towards reference state
@@ -51,14 +47,23 @@ So MPC optimize current and future actuators to keep states in desired values us
 48     }
 ```
 
-* cte - cross track error
-* epsi - error of car orientation. It is difference between current psi and desired psi in the current point
-* (v - v_desired)^2 - we want our car to drive with desired velocity
-* delta^2 and a^2 - we want not to use big actuators values without reason
-* 1000 * (delta - delta_prev)^2 - we want to have smooth steering commands between iterations
-* 100 * (a - a_prev)^2 - we want to have smooth gas/break commands between iterations
+where
+
+* cte is the cross track error
+* epsi is the error of orientation error
+* (v - ref_v) is the difference between current velocity and a desired velocity
+* delta^2 and a^2 limits the use of actuators
+* (delta - delta_prev)^2  and (a - a_prev)^2 limits the actuator speed 
+
+The weights are determined experimentally. A higher emphasis is put on optimizing the car's state itself and limiting the steering speed, resulting in smooth steering. Also an appropriate trade off between speed an stability needs to be found. Setting the weights for (v-ref_v) to 10 gives good results.
 
 # Hyper parameters
+
+The optimizer predict N time steps with a delta of dt seconds between each prediction. The higher N the more the optimizer looks into the future. The smaller dt the higher the time resolution of predictions. Therefor N should be as large as possible, while dt should be as small as possible. The downside is that calculating a lot of prediction steps is computational expensive and therefor a trade off between optimization time and accuracy needs to be found. 
+For the simulator the following values give good results:
+
+* dt = 0.1 (a time step of 0.1 provides enough resolution)
+* N = 10 (planing one second ahead is sufficient for this control task)
 
 ---
 
