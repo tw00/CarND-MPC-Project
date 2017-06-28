@@ -43,8 +43,8 @@ class FG_eval {
     // minimize actuator speed
     for (int t = 0; t < N - 2; t++) {
       // especially limit actuator speed of steering wheel to prevent fast steering
-      cost += 100 * CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
-      cost +=   1 * CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
+      cost += 1000 * CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
+      cost +=    1 * CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
     }
     fg[0] = cost;
 
